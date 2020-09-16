@@ -1,18 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main Page</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="jquery/jquery-3.5.1.min.js"></script>
     <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
-    <nav>
-        Todo
+    <nav class="navigation">
+        <div class="navigation__column">
+            <a href='#'>
+                <img src='img/instagram_logo.png'>
+            </a>
+        </div>
+        <div class="navigation__column">
+            <i class="fa fa-search"></i>
+            <input type="text" placeholder="Search">
+        </div>
+        <div class="navigation__column">
+            <ul class="navigation__links">
+                <li class="navigation__list-item">
+                    <a href="#" class="navigation__link">
+                        <i class="fa fa-compass fa-lg"></i>
+                    </a>
+                </li>
+                <li class="navigation__list-item">
+                    <a href="#" class="navigation__link">
+                        <i class="fa fa-heart-o fa-lg"></i>
+                    </a>
+                </li>
+                <li class="navigation__list-item">
+                    <a href="#" class="navigation__link">
+                        <i class="fa fa-user-o fa-lg"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
     </nav>
-    <main>
-        Todo
+    <main id="profile">
+        <header class="profile__header">
+            <div class="profile__column">
+                <img src="img/blank_avatar.png">
+            </div>
+            <div class="profile__column">
+                <div class="profile__title">
+                    <h3 class="profile__username">Junse_94</h3>
+                    <a href="#">Edit profile</a>
+                    <i class="fa fa-cog fa-lg"></i>
+                </div>
+                <ul class="profile__stats">
+                    <li class="profile__stat">
+                        <span class="stat__number posts">4</span> posts
+                    </li>
+                    <li class="profile__stat">
+                        <span class="stat__number followers">50</span> followers
+                    </li>
+                    <li class="profile__stat">
+                        <span class="stat__number follows">50</span> follows
+                    </li>
+                </ul>
+                <p class="profile__bio">
+                    <span class="profile__full-name">
+                        Yoon Jun Seok
+                    </span>
+                </p>
+            </div>
+        </header>
+        <section class="profile__photos">
+            <div class="col-md-4 profile__photo">
+                <img src="img/feedPhoto/1.png">
+                <div class="profile__photo-overlay">
+                    <span class="overlay__item">
+                        <i class="fa fa-heart"></i>
+                        33
+                    </span>
+                    <span class="overlay__item">
+                        <i class="fa fa-comment"></i>
+                        10
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 profile__photo">
+                <img src="img/feedPhoto/2.png">
+                <div class="profile__photo-overlay">
+                    <span class="overlay__item">
+                        <i class="fa fa-heart"></i>
+                        33
+                    </span>
+                    <span class="overlay__item">
+                        <i class="fa fa-comment"></i>
+                        10
+                    </span>
+                </div>
+            </div>
+            <div class="profile__photo empty__photo">
+                <input type="file" id="img_input" accept="img/*" required multiple>
+                <i class="fa fa-plus-circle" id="browser_img_input"></i>
+            </div>
+        </section>
     </main>
     <footer>
         Todo
@@ -20,3 +109,12 @@
 </body>
 
 </html>
+
+<script type="text/javascript">
+    const browse_img_input_btn = $('#browser_img_input');
+    const real_img_input_btn = $('#img_input');
+
+    browse_img_input_btn.on('click', function () {
+        real_img_input_btn.click();
+    });
+</script>
