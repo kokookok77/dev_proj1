@@ -1,3 +1,5 @@
 {
-    "liveServer.settings.port": 5501
+    "liveServer.settings.port": 5501,
+    "python.pythonPath": "C:\\Users\\InKwang Oh\\.virtualenvs\\dev_proj1-DdCPtCmW\\Scripts\\python.exe",
+    "python.formatting.provider": "black"
 }
