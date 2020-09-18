@@ -12,12 +12,13 @@ Flask가 templates 폴더의 경로를 자동으로 인식하는 듯 함
 ```Pipfile, Pipfile.lock ``` : Pipfile 파일과 Pipfile.lock 파일을 내려받은 후에 pipenv install 커맨드 하나로 모든 패키지를 한 방에 설치할 수 있음
 
 # Jinja2란
- Python 웹 프레임워크인 Flask에 내장되어 있는 Template 엔진
- html 파일에 변수를 넣어서 template을 렌더링하여 보여줌
- templates/profile.html 에서 코드 변경 필요
+* Python 웹 프레임워크인 Flask에 내장되어 있는 Template 엔진
+* html 파일에 변수를 넣어서 template을 렌더링하여 보여줌
+* templates/profile.html 에서 코드 변경 필요
 
 ```html
 <script type="text/javascript" src="{{ url_for('static', filename='jquery/jquery-3.5.1.min.js')}}"></script>
 <link rel="stylesheet" href="{{url_for('static',filename='styles.css')}}">
 ```
-ex) '{{}}'을 통해 파이썬 변수를 작동시키고, url_for('static',filename='styles.css')의 파이썬 함수를 통해 'static' 폴더의 styles.css를 불러오는 형식
+ex) ```{{ variable }}```을 통해 파이썬 variable를 연동시킴. \
+즉 url_for('static',filename='styles.css')의 파이썬 함수를 통해 'static' 폴더의 styles.css를 불러오는 형식
