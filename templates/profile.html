@@ -98,8 +98,11 @@
                 </div>
             </div>
             <div class="profile__photo empty__photo">
-                <input type="file" id="img_input" accept="img/*" required multiple>
-                <i class="fa fa-plus-circle" id="browser_img_input"></i>
+                <form id="imgUpload" method="post" action="" enctype="multipart/form-data">
+                    <input type="file" id="img_input" accept="img/*" required multiple>
+                    <i class="fa fa-plus-circle" id="browser_img_input"></i>
+                    <input type="button" value="Upload" id="files_upload">
+                </form>
             </div>
         </section>
     </main>
@@ -111,10 +114,44 @@
 </html>
 
 <script type="text/javascript">
+    
+$(document).ready(function() {
     const browse_img_input_btn = $('#browser_img_input');
     const real_img_input_btn = $('#img_input');
 
     browse_img_input_btn.on('click', function () {
         real_img_input_btn.click();
     });
+
+    $('#files_upload').click(function () {
+
+        var imageData = new FormData();
+        var files = $('#img_input')[0].files;
+
+        for (var i = 0; i < files.length; i++) {
+            imageData.append('uploadImage', files[i]);
+        }
+
+        $.ajax({
+            url: "{{url_for('image_bp.imageUpload')}}",
+            processData: false,
+            contentType: false,
+            type: "POST",
+            data: {
+                'image_input': imageData
+            },
+            success: function (data) {
+                alert("Image Upload Success")
+                console.log(data)
+            },
+            complete: function () {
+                console.log('complete')
+            },
+            error: function (data) {
+                alert("Error");
+                console.log(data);
+            }
+        });
+    });
+});
 </script>
