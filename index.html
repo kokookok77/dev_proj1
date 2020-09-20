@@ -71,50 +71,85 @@
             </div>
         </header>
         <section class="profile__photos">
-            <div class="col-md-4 profile__photo">
+            <div class="col-md-4 profile__photo w_long">
                 <img src="img/feedPhoto/1.png">
-                <div class="profile__photo-overlay">
-                    <span class="overlay__item">
-                        <i class="fa fa-heart"></i>
-                        33
-                    </span>
-                    <span class="overlay__item">
-                        <i class="fa fa-comment"></i>
-                        10
-                    </span>
-                </div>
             </div>
-            <div class="col-md-4 profile__photo">
+            <div class="col-md-4 profile__photo w_long">
                 <img src="img/feedPhoto/2.png">
-                <div class="profile__photo-overlay">
-                    <span class="overlay__item">
-                        <i class="fa fa-heart"></i>
-                        33
-                    </span>
-                    <span class="overlay__item">
-                        <i class="fa fa-comment"></i>
-                        10
-                    </span>
-                </div>
             </div>
             <div class="profile__photo empty__photo">
-                <input type="file" id="img_input" accept="img/*" required multiple>
                 <i class="fa fa-plus-circle" id="browser_img_input"></i>
             </div>
+            <input type="file" id="img_input" accept="img/*" required multiple>
         </section>
     </main>
     <footer>
-        Todo
     </footer>
 </body>
 
 </html>
 
 <script type="text/javascript">
+    // when browser's plus btn is clicked, real input file works.  
     const browse_img_input_btn = $('#browser_img_input');
     const real_img_input_btn = $('#img_input');
-
     browse_img_input_btn.on('click', function () {
         real_img_input_btn.click();
     });
+
+    function getPostNum() {
+        var post_num = 0;
+        $('.profile__photo').each(function () {
+            post_num++;
+        });
+        return post_num;
+    }
+
+    function getPostForm(index, result, name) {
+        var post_form = `<div class="col-md-4 profile__photo" id="${index}">\
+            <img src = ${result} data-file="${name}" >\
+        </div >\
+        `
+        return post_form
+    }
+
+    function addNewPost(e) {
+        var empty_post_form = '<div class="profile__photo empty__photo">\
+            <i class="fa fa-plus-circle" id="browser_img_input"></i>\
+        </div>\
+        '
+        // collect input's files
+        var self_files = [];
+        var files = e.target.files;
+        var fileArr = Array.prototype.slice.call(files);
+
+        // count the number of posts that will be used for post's id.
+        var post_num = getPostNum();
+
+        fileArr.forEach(function (f) {
+            if (!f.type.match("image/.*")) {
+                alert("이미지 파일만 업로드 가능합니다.");
+                return;
+            };
+            // limit the maximum # of photos that users can upload.
+            if (files.length < 11) {
+                self_files.push(f);
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    // empty post delete > new post append > empty post append 
+                    $('.empty__photo').remove();
+                    $('.profile__photos').append(getPostForm(post_num, e.target.result, f.name));
+                    $('.profile__photos').append(empty_post_form)
+                };
+                reader.readAsDataURL(f);
+            }
+        })
+        // limit the maximum # of photos that users can upload.
+        if (files.length > 11) {
+            alert("최대 10장까지만 업로드 할 수 있습니다.");
+        }
+        $('.post').text(post_num);
+    }
+
+    $('#img_input').on('change', addNewPost);
 </script>
