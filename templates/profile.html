@@ -99,7 +99,7 @@
             </div>
             <div class="profile__photo empty__photo">
                 <form id="imgUpload" method="post" action="" enctype="multipart/form-data">
-                    <input type="file" id="img_input" accept="img/*" required multiple>
+                    <input type="file" name="file" id="img_input" accept="img/*" required multiple>
                     <i class="fa fa-plus-circle" id="browser_img_input"></i>
                     <input type="button" value="Upload" id="files_upload">
                 </form>
@@ -125,9 +125,9 @@ $(document).ready(function() {
 
     $('#files_upload').click(function () {
 
-        var imageData = new FormData();
         var files = $('#img_input')[0].files;
-
+        imageData = new FormData();
+        
         for (var i = 0; i < files.length; i++) {
             imageData.append('uploadImage', files[i]);
         }
@@ -136,13 +136,15 @@ $(document).ready(function() {
             url: "{{url_for('image_bp.imageUpload')}}",
             processData: false,
             contentType: false,
+            datatype: 'json',
+            cache: false,
             type: "POST",
-            data: {
-                'image_input': imageData
-            },
-            success: function (data) {
+            data: imageData,
+            success: function () {
                 alert("Image Upload Success")
-                console.log(data)
+                for (var key of imageData.entries()) {
+                console.log(key[0] + ', ' + key[1])
+                }
             },
             complete: function () {
                 console.log('complete')

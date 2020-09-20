@@ -1,18 +1,41 @@
-from flask import Blueprint, request, jsonify
+import os
+
+from flask import Blueprint, request, jsonify, make_response, redirect, url_for
+from werkzeug.utils import secure_filename
 
 bp = Blueprint("image_bp", __name__, url_prefix="/imgInput", template_folder='templates')
 
-@bp.route('/imageUpload', methods=['POST'])
+
+ALLOWED_EXTENSIONS = set(['pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
+def allowed_file(filename):
+	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+	
+
+@bp.route('/imageUpload', methods=["POST"])
 def imageUpload():
     '''
         Image Upload
     '''
 
     try:
-        image = request.form['image_input']
-        print(image)
+        files = request.files.getlist("uploadImage")
+        print(files)
+
+        for file in files:
+            print(file)
+            filename = secure_filename(file.filename)
+            file.save(os.path.join('./', filename))
+
+        return ""
+
+            # if file and allowed_file(file.filename):
+            #     file.save(os.path.join('./', filename))
+            #     print(file.filename)
+            # else:
+            #     print('Error: "File type is not allowed"')
 
     except Exception as e:
         print('Error:', e)
 
-    return ""
+        return ""
