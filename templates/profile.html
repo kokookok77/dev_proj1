@@ -104,56 +104,55 @@
                     <input type="button" value="Upload" id="files_upload">
                 </form>
             </div>
+            <input type="file" id="img_input" accept="img/*" required multiple>
         </section>
     </main>
     <footer>
-        Todo
     </footer>
 </body>
 
 </html>
 
 <script type="text/javascript">
-    
-$(document).ready(function() {
-    const browse_img_input_btn = $('#browser_img_input');
-    const real_img_input_btn = $('#img_input');
 
-    browse_img_input_btn.on('click', function () {
-        real_img_input_btn.click();
-    });
+    $(document).ready(function () {
+        const browse_img_input_btn = $('#browser_img_input');
+        const real_img_input_btn = $('#img_input');
+        browse_img_input_btn.on('click', function () {
+            real_img_input_btn.click();
+        });
 
-    $('#files_upload').click(function () {
+        $('#files_upload').click(function () {
 
-        var files = $('#img_input')[0].files;
-        imageData = new FormData();
-        
-        for (var i = 0; i < files.length; i++) {
-            imageData.append('uploadImage', files[i]);
-        }
+            var files = $('#img_input')[0].files;
+            imageData = new FormData();
 
-        $.ajax({
-            url: "{{url_for('image_bp.imageUpload')}}",
-            processData: false,
-            contentType: false,
-            datatype: 'json',
-            cache: false,
-            type: "POST",
-            data: imageData,
-            success: function () {
-                alert("Image Upload Success")
-                for (var key of imageData.entries()) {
-                console.log(key[0] + ', ' + key[1])
-                }
-            },
-            complete: function () {
-                console.log('complete')
-            },
-            error: function (data) {
-                alert("Error");
-                console.log(data);
+            for (var i = 0; i < files.length; i++) {
+                imageData.append('uploadImage', files[i]);
             }
+
+            $.ajax({
+                url: "{{url_for('image_bp.imageUpload')}}",
+                processData: false,
+                contentType: false,
+                datatype: 'json',
+                cache: false,
+                type: "POST",
+                data: imageData,
+                success: function () {
+                    alert("Image Upload Success")
+                    for (var key of imageData.entries()) {
+                        console.log(key[0] + ', ' + key[1])
+                    }
+                },
+                complete: function () {
+                    console.log('complete')
+                },
+                error: function (data) {
+                    alert("Error");
+                    console.log(data);
+                }
+            });
         });
     });
-});
 </script>

@@ -193,15 +193,16 @@
 }
 
 .profile__photos .profile__photo {
-    width: 31%;
-    margin-bottom: 35px;
+    width: 290px;
+    height: 290px;
     position: relative;
-    margin-right: 1%;
-    margin-left: 1%;
+    margin: 1%;
+    overflow: hidden;
 }
 
 .profile__photo img {
-    width: 100%;
+    position: absolute;
+    max-height: 100%;
 }
 
 .profile__photo .profile__photo-overlay {
