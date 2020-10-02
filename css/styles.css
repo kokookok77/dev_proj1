@@ -200,18 +200,9 @@
     overflow: hidden;
 }
 
-.w_long img {
+.profile__photo img {
     position: absolute;
-    width: auto;
     max-height: 100%;
-    height: 100%;
-}
-
-.h_long img {
-    position: absolute;
-    height: auto;
-    max-width: 100%;
-    width: 100%;
 }
 
 .profile__photo .profile__photo-overlay {
