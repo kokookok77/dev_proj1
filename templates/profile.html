@@ -71,7 +71,7 @@
             </div>
         </header>
         <section class="profile__photos">
-            <div class="col-md-4 profile__photo">
+            <div class="col-md-4 profile__photo" id="1" onclick="load_post_modal('1')">
                 <img src="{{url_for('static', filename='images/feedPhoto/1.png')}}">
                 <div class="profile__photo-overlay">
                     <span class="overlay__item">
@@ -84,7 +84,7 @@
                     </span>
                 </div>
             </div>
-            <div class="col-md-4 profile__photo">
+            <div class="col-md-4 profile__photo" id="2" onclick="load_post_modal('2')">
                 <img src="{{url_for('static', filename='images/feedPhoto/2.png')}}">
                 <div class="profile__photo-overlay">
                     <span class="overlay__item">
@@ -97,15 +97,15 @@
                     </span>
                 </div>
             </div>
-            <div class="profile__photo empty__photo">
+            <div class="empty__photo">
                 <form id="imgUpload" method="post" action="" enctype="multipart/form-data">
                     <input type="file" name="file" id="img_input" accept="img/*" required multiple>
                     <i class="fa fa-plus-circle" id="browser_img_input"></i>
-                    <input type="button" value="Upload" id="files_upload">
+                    <!--<input type="button" value="Upload" id="files_upload">-->
                 </form>
             </div>
-            <input type="file" id="img_input" accept="img/*" required multiple>
         </section>
+        {% include "modal_post.html" %}
     </main>
     <footer>
     </footer>
@@ -121,9 +121,32 @@
         browse_img_input_btn.on('click', function () {
             real_img_input_btn.click();
         });
+        $('#img_input').on('change', fileUpload);
+        $('.profile__photo').on('click', function () {
+            reset_post_modal($(this).children()[0].src, this.id);
+        });
+        $('#post_modal').hide();
+    });
 
-        $('#files_upload').click(function () {
+    // inputfile upload to server
+    function fileUpload(e) {
+        // collect input's files
+        var self_files = [];
+        var files = e.target.files;
+        var fileArr = Array.prototype.slice.call(files);
 
+        fileArr.forEach(function (f) {
+            if (!f.type.match("image/.*")) {
+                alert("이미지 파일만 업로드 가능합니다.");
+                return;
+            }
+        });
+        if (files.length > 10) {
+            // limit the maximum # of photos that users can upload.
+            alert("최대 10장까지만 업로드 할 수 있습니다.");
+            return;
+        } else {
+            // image upload
             var files = $('#img_input')[0].files;
             imageData = new FormData();
 
@@ -132,7 +155,7 @@
             }
 
             $.ajax({
-                url: "{{url_for('image_bp.imageUpload')}}",
+                url: "{{url_for('imageUpload')}}",
                 processData: false,
                 contentType: false,
                 datatype: 'json',
@@ -144,6 +167,7 @@
                     for (var key of imageData.entries()) {
                         console.log(key[0] + ', ' + key[1])
                     }
+                    addNewPost(e);
                 },
                 complete: function () {
                     console.log('complete')
@@ -153,6 +177,42 @@
                     console.log(data);
                 }
             });
+        };
+    };
+
+
+    function getPostNum() {
+        var post_num = 0;
+        $('.profile__photo').each(function () {
+            post_num++;
         });
-    });
+        return post_num;
+    }
+
+    function getPostForm(index, addr, name) {
+        var post_form = `<div class="col-md-4 profile__photo" id="${index}" onclick="load_post_modal('${index}')">\
+            <img src = ${addr} data-file="${name}">\
+        </div >\
+        `
+        return post_form
+    }
+
+    function addNewPost() {
+        // count the number of posts that will be used for post's id.
+        var post_num = getPostNum();
+
+        var files = $('#img_input')[0].files;
+        var fileArr = Array.prototype.slice.call(files);
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('.profile__photos').prepend(getPostForm(post_num + 1, e.target.result, fileArr[0].name));
+        };
+        reader.readAsDataURL(fileArr[0]);
+        $('.post').text(post_num);
+    }
+
+    function load_post_modal(id) {
+        var post_element = $("#" + id);
+        reset_post_modal(post_element.children()[0].src, id);
+    };
 </script>

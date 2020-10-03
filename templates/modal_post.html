@@ -1,0 +1,48 @@
+<div id="post_modal" class="modal">
+    <div class="photo">
+        <div class="photo__header">
+            <img src="{{url_for('static', filename='images/blank_avatar.png')}}" class="photo__avatar" />
+            <div class="photo__user-info">
+                <span class="photo__author">Yoon Jun Seok</span>
+                <span class="photo__location">Bestechung</span>
+            </div>
+            <i class="fa fa-times" onclick="close_post_modal()"></i>
+        </div>
+        <div class="photo__main">
+        </div>
+        <div class="photo__info">
+            <div class="photo__actions">
+                <span class="photo__action">
+                    <i class="fa fa-heart-o fa-lg"></i>
+                </span>
+                <span class="photo__action">
+                    <i class="fa fa-comment-o fa-lg"></i>
+                </span>
+            </div>
+            <span class="photo__likes">45 likes</span>
+            <ul class="photo__comments">
+                <li class="photo__comment">
+                    <span class="photo__comment-author">serranoarevalo</span> love this!
+                </li>
+            </ul>
+            <span class="photo__time-ago">2 hours ago</span>
+            <div class="photo__add-comment-container">
+                <textarea name="comment" placeholder="Add a comment..."></textarea>
+                <i class="fa fa-ellipsis-h"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function reset_post_modal(imgAddr, img_id) {
+        var img_html = `<img src=${imgAddr} id=${img_id}>`
+        $('#post_modal .photo__main').children().remove();
+        $('#post_modal .photo__main').append(img_html)
+        $('#post_modal').show();
+    }
+
+    function close_post_modal() {
+        $('#post_modal').hide();
+    }
+</script>

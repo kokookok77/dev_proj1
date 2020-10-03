@@ -1,5 +1,9 @@
 {
     "liveServer.settings.port": 5501,
-    "python.pythonPath": "C:\\Users\\InKwang Oh\\.virtualenvs\\dev_proj1-DdCPtCmW\\Scripts\\python.exe",
-    "python.formatting.provider": "black"
+    "python.pythonPath": "C:\\Users\\윤준석\\AppData\\Local\\Programs\\Python\\Python38-32\\python.exe",
+    "python.formatting.provider": "autopep8",
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true,
+    "git.ignoreLimitWarning": true
 }
