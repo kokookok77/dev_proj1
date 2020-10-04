@@ -4,7 +4,11 @@
 # 파일 설명
 ```app.py``` : web app 실행을 위한 file
 
+```config.py```: 파일 저장 경로 등의 설정 파일
+
 ```static folder``` : js, css, images 등 정적 웹 서버를 위한 file
+
+```python_code folder``` : python 코드 기반 함수 및 모델이 포함된 폴더
 
 ```templates folder``` : html file
 Flask가 templates 폴더의 경로를 자동으로 인식하는 듯 함
