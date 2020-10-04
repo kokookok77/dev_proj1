@@ -129,12 +129,12 @@
     });
 
     // inputfile upload to server
-    function fileUpload(e) {
+    function fileUpload() {
         // collect input's files
         var self_files = [];
-        var files = e.target.files;
+        var files = $('#img_input')[0].files;
         var fileArr = Array.prototype.slice.call(files);
-
+        var imageData = new FormData();
         fileArr.forEach(function (f) {
             if (!f.type.match("image/.*")) {
                 alert("이미지 파일만 업로드 가능합니다.");
@@ -145,17 +145,15 @@
             // limit the maximum # of photos that users can upload.
             alert("최대 10장까지만 업로드 할 수 있습니다.");
             return;
+
         } else {
-            // image upload
-            var files = $('#img_input')[0].files;
-            imageData = new FormData();
 
             for (var i = 0; i < files.length; i++) {
                 imageData.append('uploadImage', files[i]);
             }
 
             $.ajax({
-                url: "{{url_for('imageUpload')}}",
+                url: "{{url_for('bp.imageUpload')}}",
                 processData: false,
                 contentType: false,
                 datatype: 'json',
@@ -167,7 +165,7 @@
                     for (var key of imageData.entries()) {
                         console.log(key[0] + ', ' + key[1])
                     }
-                    addNewPost(e);
+                    addNewPost();
                 },
                 complete: function () {
                     console.log('complete')
@@ -208,7 +206,7 @@
             $('.profile__photos').prepend(getPostForm(post_num + 1, e.target.result, fileArr[0].name));
         };
         reader.readAsDataURL(fileArr[0]);
-        $('.post').text(post_num);
+        $('.posts').text(post_num);
     }
 
     function load_post_modal(id) {
