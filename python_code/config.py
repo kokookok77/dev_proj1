@@ -1,5 +1,6 @@
 BATCH_SIZE = 64
 BUFFER_SIZE = 1000
+EPOCHS = 20
 embedding_dim = 256
 units = 512
 top_k = 5000

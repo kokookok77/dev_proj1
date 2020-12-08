@@ -3,6 +3,7 @@ import json
 import random
 import collections
 import tensorflow as tf
+from tensorflow.keras.utils import Sequence
 from PIL import Image
 import numpy as np
 import zipfile
@@ -10,9 +11,16 @@ import zipfile
 import config
 
 
+# 일부 손상된 이미지에 대해서도 읽을 수 있게 해줌
+Image.LOAD_TRUNCATED_IMAGES = True
+
+
 # data set category
-category = {"nature-scene": ["beach", "cave", "island", "lake", "mountain"],
-            "person-made": ["amusement park", "palace", "park", "restaurant", "tower"]}
+# test with small set
+category = {"nature-scene": ["beach"],
+            "person-made": ["tower"]}
+# category = {"nature-scene": ["beach", "cave", "island", "lake", "mountain"],
+#             "person-made": ["amusement park", "palace", "park", "restaurant", "tower"]}
 
 
 # feature extraction model load
@@ -23,14 +31,16 @@ hidden_layer = image_model.layers[-1].output
 
 image_features_extract_model = tf.keras.Model(new_input, hidden_layer)
 
-class KoreaTouristSpotDataSet:
+class KoreaTouristSpotDataSet(Sequence):
     """
     usage 
-    data_set = KoreaTouristSpotDataSet(anno_type="caption") or anno_type="tag"
+    data_set = KoreaTouristSpotDataSet(anno_type="caption", mode="train") or 
+    anno_type in {"caption", "hashtag"}, mode in {"train", "valid", "test", "total"}
     data_set.load_data() 
     """
 
-    def __init__(self, anno_type="caption"):
+    def __init__(self, anno_type="caption", mode="total"):
+        super().__init__()
         self.BATCH_SIZE = config.BATCH_SIZE
         self.BUFFER_SIZE = config.BUFFER_SIZE
         self.embedding_dim = config.embedding_dim
@@ -42,22 +52,21 @@ class KoreaTouristSpotDataSet:
         self.features_shape = config.features_shape
         self.attention_features_shape = config.attention_features_shape
         self.anno_type = anno_type
+        self.mode = mode
 
-    def load_data():
         # 파일 없을 경우 구글 드라이브에서 다운
         if not os.path.exists("./data/Korean-Tourist-Spot-Dataset-v0.1.zip"):
             print("data set is not ready. Start Download..")
             print("download complete")
             pass
         
-
-        # zip 파일만 있을 경우 압축 해제
-        if not os.path.exists("./data/Korean-Tourist-Spot-Dataset-v0.1"):
+        # zip파일 압축해제 안된 경우 압축 해제
+        if not os.path.exists("./data/DGU-AI-LAB-Korean-Tourist-Spot-Dataset-62a483a"):
             print("zip file is ready but not uncompressed.")
             print("start uncompress..")
             try:
                 with zipfile.ZipFile("./data/Korean-Tourist-Spot-Dataset-v0.1.zip") as zf:
-                    zf.extractall()
+                    zf.extractall("./data/")
                     print("uncompress success")
             except:
                 print("uncompress fail")
@@ -65,14 +74,14 @@ class KoreaTouristSpotDataSet:
         else:
             image_path_to_caption = collections.defaultdict(list)
             
-            caption_list = []
+            caption_vector = []
             img_name_vector = []
 
             for key, val in category.items():
                 for v in val:
-                    json_dir = os.path.join("./data/Korean-Tourist-Spot-Dataset-v0.1/DGU-AI-LAB-Korean-Tourist-Spot-Dataset-62a483a/kts/" + mode, key, v, v + ".json")
+                    json_dir = os.path.join("./data/DGU-AI-LAB-Korean-Tourist-Spot-Dataset-62a483a/kts//" + self.mode, key, v, v + ".json")
                     image_folder_dir = os.path.join(
-                        "./data/Korean-Tourist-Spot-Dataset-v0.1/DGU-AI-LAB-Korean-Tourist-Spot-Dataset-62a483a/kts/" + mode, key, v, "images")
+                        "./data/DGU-AI-LAB-Korean-Tourist-Spot-Dataset-62a483a/kts//" + self.mode, key, v, "images")
 
                     with open(json_dir, encoding="UTF-16") as f:
                         js = json.load(f)
@@ -92,12 +101,16 @@ class KoreaTouristSpotDataSet:
                     
                     random.shuffle(image_paths)
 
-            print("total Set : ", len(caption_list))
 
             for image_path in image_paths:
-                caption_list.extend(image_path_to_caption[image_path])
+                #append 는 단순 요소 추가, extend는 iterable 요소 모두 추가
+                caption = image_path_to_caption[image_path]
+                caption_vector.append(caption)
+                # caption_vector.extend(caption)
                 # image 한 장에 caption이 다수 일때
-                img_name_vector.extend([image_path] * len(caption_list))
+                img_name_vector.append(image_path)
+
+            print("total Set : ", len(caption_vector))
 
             # Get unique images
             encode_train = sorted(set(img_name_vector))
@@ -121,15 +134,12 @@ class KoreaTouristSpotDataSet:
             tokenizer = tf.keras.preprocessing.text.Tokenizer(num_words=self.top_k,
                                                             oov_token="<unk>",
                                                             filters='!"#$%&()*+.,-/:;=?@[\]^_`{|}~ ')
-            tokenizer.fit_on_texts(train_captions)
-            train_seqs = tokenizer.texts_to_sequences(train_captions)
+            tokenizer.fit_on_texts(caption_vector)
+            train_seqs = tokenizer.texts_to_sequences(caption_vector)
 
             tokenizer.word_index['<pad>'] = 0
             tokenizer.index_word[0] = '<pad>'
 
-            # Create the tokenized vectors
-            train_seqs = tokenizer.texts_to_sequences(train_captions)   
-            
             # Pad each vector to the max_length of the captions
             # If you do not provide a max_length value, pad_sequences calculates it automatically
             cap_vector = tf.keras.preprocessing.sequence.pad_sequences(train_seqs, padding='post')
@@ -180,11 +190,18 @@ class KoreaTouristSpotDataSet:
             dataset = dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
             print("data set load complete!")
-            return dataset, img_name_val, cap_val
+            return dataset, img_name_val, cap_val, tokenizer
 
-def image_preprocessing(image_path):
-    img = tf.io.read_file(image_path)
-    img = tf.image.decode_jpeg(img, channels=3)
+def load_image(image_path):
+    # 손상된 이미지 읽을 때 에러남
+    # img = tf.io.read_file(image_path)
+    # img = tf.image.decode_jpeg(img, channels=3)
+    
+    # PIL로 손상된 이미지도 읽을 수 있음 세부설정은 import 문 아래 참고
+    # image_path 는 tensor string으로 주어지기 때문에 캐스팅 필요 안할경우 에러
+    image_path = image_path.numpy().decode('utf-8')
+    img = Image.open(image_path)
+    img = tf.keras.preprocessing.image.img_to_array(img)
     img = tf.image.resize(img, (299, 299))
     img = tf.keras.applications.inception_v3.preprocess_input(img)
     return img, image_path
@@ -192,8 +209,8 @@ def image_preprocessing(image_path):
 
 # Load the numpy files
 def map_func(img_name, cap):
-  img_tensor = np.load(img_name.decode('utf-8')+'.npy')
-  return img_tensor, cap
+    img_tensor = np.load(img_name.decode('utf-8')+'.npy')
+    return img_tensor, cap
 
 # Find the maximum length of any caption in our dataset
 def calc_max_length(tensor):
